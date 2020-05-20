@@ -1,6 +1,7 @@
 const endPoint = "http://localhost:3000/api/v1/syllabuses"
 
 document.addEventListener('DOMContentLoaded', () => {
+  // fetch and load syllabi
   getSyllabi()
 
   const createSyllabusForm = document.querySelector("#create-syllabus-form")
@@ -13,21 +14,15 @@ function getSyllabi() {
   .then(response => response.json())
   .then(syllabi => {
     syllabi.data.forEach(syllabus => {
-        // double check how your data is nested in the console so you can successfully access the attributes of each individual object
-        const syllabusMarkup = `
-          <div data-id=${syllabus.id}>
-            <img src=${syllabus.attributes.image_url} height="200" width="250">
-            <h3>${syllabus.attributes.title}</h3>
-            <p>${syllabus.attributes.category.name}</p>
-            <button data-id=${syllabus.id}>edit</button>
-          </div>
-          <br><br>`;
+      // double check how your data is nested in the console so you can successfully access the attributes of each individual object
+      // debugger
+      let newSyllabus = new Syllabus(syllabus, syllabus.attributes)
 
-          document.querySelector('#syllabus-container').innerHTML += syllabusMarkup
-      })
+      document.querySelector('#syllabus-container').innerHTML += newSyllabus.renderSyllabusCard()
     })
+  // .catch(err => console.log(err))
+  })
 }
-
 
 function createFormHandler(e) {
   e.preventDefault()
@@ -49,18 +44,14 @@ function postFetch(title, description, image_url, category_id) {
     body: JSON.stringify(bodyData)
   })
   .then(response => response.json())
+  // .catch(err => console.log(err))
   .then(syllabus => {
-    const syllabusData = syllabus.data.attributes
+    console.log(syllabus);
+    const syllabusData = syllabus.data
     // render JSON response
-    const syllabusMarkup = `
-    <div data-id=${syllabus.id}>
-      <img src=${syllabusData.image_url} height="200" width="250">
-      <h3>${syllabusData.title}</h3>
-      <p>${syllabusData.category.name}</p>
-      <button data-id=${syllabusData.id}>edit</button>
-    </div>
-    <br><br>`;
+    let newSyllabus = new Syllabus(syllabusData, syllabusData.attributes)
 
-    document.querySelector('#syllabus-container').innerHTML += syllabusMarkup;
+    document.querySelector('#syllabus-container').innerHTML += newSyllabus.renderSyllabusCard()
   })
+
 }
